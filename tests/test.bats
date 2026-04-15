@@ -39,17 +39,23 @@ setup() {
 }
 
 health_checks() {
-  # Do something useful here that verifies the add-on
-
-  # You can check for specific information in headers:
-  # run curl -sfI https://${PROJNAME}.ddev.site
-  # assert_output --partial "HTTP/2 200"
-  # assert_output --partial "test_header"
-
-  # Or check if some command gives expected output:
-  DDEV_DEBUG=true run ddev launch
+  # The drupalorg binary must be on PATH in the web container.
+  run ddev exec which drupalorg
   assert_success
-  assert_output --partial "FULLURL https://${PROJNAME}.ddev.site"
+  assert_output --partial "/usr/local/bin/drupalorg"
+
+  # It must be executable and respond to --version.
+  run ddev exec drupalorg --version
+  assert_success
+
+  # The bash completion file must be installed system-wide.
+  run ddev exec test -f /etc/bash_completion.d/drupalorg
+  assert_success
+
+  # The completion script must register the drupalorg command when sourced.
+  run ddev exec bash -c 'source /etc/bash_completion.d/drupalorg && complete -p drupalorg'
+  assert_success
+  assert_output --partial "drupalorg"
 }
 
 teardown() {

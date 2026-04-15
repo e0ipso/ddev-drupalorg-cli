@@ -3,11 +3,11 @@
 [![last commit](https://img.shields.io/github/last-commit/e0ipso/ddev-drupalorg-cli)](https://github.com/e0ipso/ddev-drupalorg-cli/commits)
 [![release](https://img.shields.io/github/v/release/e0ipso/ddev-drupalorg-cli)](https://github.com/e0ipso/ddev-drupalorg-cli/releases/latest)
 
-# DDEV Drupalorg Cli
+# DDEV Drupal.org CLI
 
 ## Overview
 
-This add-on integrates Drupalorg Cli into your [DDEV](https://ddev.com/) project.
+This add-on installs [mglaman/drupalorg-cli](https://github.com/mglaman/drupalorg-cli) globally inside the DDEV web container, together with its bash completion script. Once installed, the `drupalorg` command is available on `PATH` in the web container.
 
 ## Installation
 
@@ -16,32 +16,35 @@ ddev add-on get e0ipso/ddev-drupalorg-cli
 ddev restart
 ```
 
-After installation, make sure to commit the `.ddev` directory to version control.
+After installation, commit the `.ddev` directory to version control.
 
 ## Usage
 
-| Command | Description |
-| ------- | ----------- |
-| `ddev describe` | View service status and used ports for Drupalorg Cli |
-| `ddev logs -s drupalorg-cli` | Check Drupalorg Cli logs |
-
-## Advanced Customization
-
-To change the Docker image:
+Run the CLI inside the web container:
 
 ```bash
-ddev dotenv set .ddev/.env.drupalorg-cli --drupalorg-cli-docker-image="ddev/ddev-utilities:latest"
-ddev add-on get e0ipso/ddev-drupalorg-cli
-ddev restart
+ddev exec drupalorg --version
+ddev exec drupalorg issue:info 3141592
 ```
 
-Make sure to commit the `.ddev/.env.drupalorg-cli` file to version control.
+Or open an interactive shell (where bash completion is active):
 
-All customization options (use with caution):
+```bash
+ddev ssh
+drupalorg <TAB>
+```
 
-| Variable | Flag | Default |
-| -------- | ---- | ------- |
-| `DRUPALORG_CLI_DOCKER_IMAGE` | `--drupalorg-cli-docker-image` | `ddev/ddev-utilities:latest` |
+The PHAR is fetched from the [latest GitHub release](https://github.com/mglaman/drupalorg-cli/releases/latest) at web-image build time. To upgrade to a newer upstream release, rebuild the image:
+
+```bash
+ddev debug refresh
+```
+
+## How it works
+
+| File | Purpose |
+| ---- | ------- |
+| `web-build/Dockerfile.drupalorg-cli` | Downloads `drupalorg.phar` to `/usr/local/bin/drupalorg` and the completion script to `/etc/bash_completion.d/drupalorg` during the web-image build. |
 
 ## Credits
 

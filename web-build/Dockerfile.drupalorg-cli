@@ -1,0 +1,14 @@
+#ddev-generated
+# Installs the Drupal.org CLI (https://github.com/mglaman/drupalorg-cli) globally
+# in the web container along with its bash completion script.
+#
+# The PHAR and completion script are fetched at image build time. To pick up a
+# new upstream release, rebuild the web image: `ddev debug refresh` or
+# `ddev restart`.
+
+RUN set -eux; \
+    curl -fsSL -o /usr/local/bin/drupalorg \
+      https://github.com/mglaman/drupalorg-cli/releases/latest/download/drupalorg.phar; \
+    chmod +x /usr/local/bin/drupalorg; \
+    curl -fsSL -o /etc/bash_completion.d/drupalorg \
+      https://raw.githubusercontent.com/mglaman/drupalorg-cli/main/drupalorg-cli-completion.sh
