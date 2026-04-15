@@ -48,7 +48,7 @@ health_checks() {
   # and the output must include a known command to prove the PHAR really ran.
   run ddev exec drupalorg list
   assert_success
-  assert_output --partial "cache:clear"
+  assert_output --partial "project:issues"
 
   # The bash completion file must be installed system-wide.
   run ddev exec test -f /etc/bash_completion.d/drupalorg
