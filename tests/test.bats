@@ -44,9 +44,11 @@ health_checks() {
   assert_success
   assert_output --partial "/usr/local/bin/drupalorg"
 
-  # It must be executable and respond to --version.
-  run ddev exec drupalorg --version
+  # It must be executable and respond to `list` (Symfony Console default),
+  # and the output must include a known command to prove the PHAR really ran.
+  run ddev exec drupalorg list
   assert_success
+  assert_output --partial "cache:clear"
 
   # The bash completion file must be installed system-wide.
   run ddev exec test -f /etc/bash_completion.d/drupalorg
