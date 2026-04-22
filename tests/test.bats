@@ -82,6 +82,45 @@ teardown() {
   health_checks
 }
 
+@test "install with zsh ssh-shell installs zsh completion" {
+  set -eu -o pipefail
+  echo "# zsh ssh-shell test for ${PROJNAME} in $(pwd)" >&3
+
+  cat > .ddev/config.zsh.yaml <<'EOF'
+webimage_extra_packages:
+  - zsh
+EOF
+  cat > .ddev/docker-compose.ssh-shell.yaml <<'EOF'
+services:
+  web:
+    x-ddev:
+      ssh-shell: zsh
+EOF
+
+  run ddev add-on get "${DIR}"
+  assert_success
+  run ddev restart -y
+  assert_success
+
+  run ddev exec which drupalorg
+  assert_success
+  assert_output --partial "/usr/local/bin/drupalorg"
+
+  run ddev exec drupalorg list
+  assert_success
+  assert_output --partial "project:issues"
+
+  run ddev exec test -f /usr/local/share/zsh/site-functions/_drupalorg
+  assert_success
+
+  run ddev exec test ! -f /etc/bash_completion.d/drupalorg
+  assert_success
+
+  run ddev exec head -n 1 /usr/local/share/zsh/site-functions/_drupalorg
+  assert_success
+  assert_output --partial "#compdef drupalorg"
+}
+
 # bats test_tags=release
 @test "install from release" {
   set -eu -o pipefail
